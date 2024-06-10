@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: server
+  template:
+    metadata:
+      labels:
+        app: server
+    spec:
+      containers:
+        - name: server
+          image: alvis/server
+          env:
+            - name: NODE_ENV
+              value: development
+            - name: NODE_OPTIONS
+              value: '--unhandled-rejections=strict'
+            - name: MONGO_URI
+              value: 'mongodb://server-mongo-srv:27017/server'
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: some-secret
+                  key: SECRET_KEY
+          resources:
+            requests:
+              cpu: '100m'
+              memory: '100Mi'
+            limits:
+              cpu: 1000m
+              memory: 1000Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: server-srv
+spec:
+  selector:
+    app: server
+  ports:
+    - name: server
+      protocol: TCP
+      port: 3000
+      targetPort: 3000

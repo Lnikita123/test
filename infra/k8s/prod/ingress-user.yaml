@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-user-service
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/use-regex: 'true'
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-local-user"
+spec:
+  tls:
+    - hosts:
+      - dev.REPLACE_THIS_WITH_DOMAIN
+      secretName: letsencrypt-local-user
+  rules:
+    - host: dev.REPLACE_THIS_WITH_DOMAIN
+      http:
+        paths:
+          - path: /?(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: client-user-srv
+                port:
+                  number: 3000

@@ -1,0 +1,37 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-minio
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/upstream-vhost: "minio-service:9000"
+    cert-manager.io/cluster-issuer: "letsencrypt-production-storage"
+spec:
+  tls:
+    - hosts:
+      - staging.storage.playalvis.com
+      - staging.dashboard.playalvis.com
+      secretName: letsencrypt-production-storage
+  rules:
+    - host: staging.storage.playalvis.com
+      http:
+        paths:
+          - path: /minio/?(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: minio-service
+                port:
+                  number: 9000
+    - host: staging.dashboard.playalvis.com
+      http:
+        paths:
+          - path: /?(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: minio-service
+                port:
+                  number: 9001

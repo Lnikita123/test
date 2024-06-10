@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client-user-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: client-user
+  template:
+    metadata:
+      labels:
+        app: client-user
+    spec:
+      containers:
+        - name: client-user
+          image: 246812043791.dkr.ecr.ap-south-1.amazonaws.com/client-user:latest
+          env:
+            - name: NODE_ENV
+              value: development
+          resources:
+            limits:
+              cpu: 500m
+              memory: 500Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: client-user-srv
+spec:
+  selector:
+    app: client-user
+  ports:
+    - name: client-user
+      protocol: TCP
+      port: 3000
+      targetPort: 3000

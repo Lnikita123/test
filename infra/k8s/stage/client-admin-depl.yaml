@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client-admin-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: client-admin
+  template:
+    metadata:
+      labels:
+        app: client-admin
+    spec:
+      containers:
+        - name: client-admin
+          image: 246812043791.dkr.ecr.ap-south-1.amazonaws.com/client-admin:latest
+          env:
+            - name: NODE_ENV
+              value: development
+          resources:
+            limits:
+              cpu: 500m
+              memory: 500Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: client-admin-srv
+spec:
+  selector:
+    app: client-admin
+  ports:
+    - name: client-admin
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
